@@ -29,6 +29,34 @@
 
 /* STUDENT APPLICATION */
 $(function() {
+    var model = {
+        days: 12
+    };
+
+    var controller = {
+        init: function() {
+            view.renderHeadings(controller.createHeadings(model.days));
+        },
+        createHeadings: function(days) {
+            var a = [];
+            for (var i = 1; i <= days; i++) {
+                a.push(i);
+            }
+            return a;
+        }
+    }
+
+    var view = {
+        renderHeadings: function(days) {
+            $("thead tr").append('<th class="name-col">Student Name</th>');
+            var length = days.length;
+            for (var i = 0; i < length; i++) {
+                $("thead tr").append('<th>' + i + '</th>');
+            }
+            $("thead tr").append('<th class="missed-col">Days Missed-col</th>');
+        }
+    };
+
     var attendance = JSON.parse(localStorage.attendance),
         $allMissed = $('tbody .missed-col'),
         $allCheckboxes = $('tbody input');
@@ -79,6 +107,6 @@ $(function() {
         countMissing();
         localStorage.attendance = JSON.stringify(newAttendance);
     });
-
     countMissing();
+    controller.init();
 }());
