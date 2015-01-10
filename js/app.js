@@ -30,12 +30,35 @@
 /* STUDENT APPLICATION */
 $(function() {
     var model = {
-        days: 12
+        days: 12,
+        students: [
+            {
+                name: "Slappy the Frog",
+                missedDays: 0
+            },
+            {
+                name: "Lilly the Lizard",
+                missedDays: 0
+            },
+            {
+                name: "Paulrus the Walrus",
+                missedDays: 0
+            },
+            {
+                name: "Gregory the Goat",
+                missedDays: 0
+            },
+            {
+                name: "Adam the Anaconda",
+                missedDays: 0
+            }
+        ]
     };
 
     var controller = {
         init: function() {
             view.renderHeadings(controller.createHeadings(model.days));
+            view.renderStudents(model.days, model.students);
         },
         createHeadings: function(days) {
             var a = [];
@@ -54,6 +77,20 @@ $(function() {
                 $("thead tr").append('<th>' + i + '</th>');
             }
             $("thead tr").append('<th class="missed-col">Days Missed-col</th>');
+        },
+        addStudent: function(days, student) {
+            var $student = $('<tr class="student"></tr>');
+            $student.append('<td class="name-col">' + student.name + '</td>');
+            for (var i = 1; i <= days; i++) {
+                $student.append('<td class="attend-col"><input type="checkbox"></td>');
+            }
+            $student.append('<td class="missed-col">' + student.missedDays + '</td>');
+            $('tbody').append($student);
+        },
+        renderStudents: function(days, students) {
+            for (student in students) {
+                view.addStudent(days,students[student]);
+            }
         }
     };
 
