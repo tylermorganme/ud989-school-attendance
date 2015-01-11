@@ -29,8 +29,8 @@
 
 /* STUDENT APPLICATION */
 (function() {
-    var Student =  function() {
-            this.name = "";
+    var Student =  function(name) {
+            this.name = name;
             this.missedDays = 0;
             this.attendance = [];
     };
@@ -48,31 +48,11 @@
     var model = {
         days: 12,
         students: [
-            {
-                name: "Slappy the Frog",
-                missedDays: 0,
-                attendance: []
-            },
-            {
-                name: "Lilly the Lizard",
-                missedDays: 0,
-                attendance: []
-            },
-            {
-                name: "Paulrus the Walrus",
-                missedDays: 0,
-                attendance: []
-            },
-            {
-                name: "Gregory the Goat",
-                missedDays: 0,
-                attendance: []
-            },
-            {
-                name: "Adam the Anaconda",
-                missedDays: 0,
-                attendance: []
-            }
+            new Student("Slappy the Frog"),
+            new Student("Lilly the Lizard"),
+            new Student("Paulrus the Walrus"),
+            new Student("Gregory the Goat"),
+            new Student("Adam the Anaconda")
         ],
         getStudents: function() {
             return model.students;
@@ -118,57 +98,6 @@
         }
     };
 
-    var attendance = JSON.parse(localStorage.attendance),
-        $allMissed = $('tbody .missed-col'),
-        $allCheckboxes = $('tbody input');
-
-    // Count a student's missed days
-    function countMissing() {
-        $allMissed.each(function() {
-            var studentRow = $(this).parent('tr'),
-                dayChecks = $(studentRow).children('td').children('input'),
-                numMissed = 0;
-
-            dayChecks.each(function() {
-                if (!$(this).prop('checked')) {
-                    numMissed++;
-                }
-            });
-
-            $(this).text(numMissed);
-        });
-    }
-
-    // Check boxes, based on attendace records
-    $.each(attendance, function(name, days) {
-        var studentRow = $('tbody .name-col:contains("' + name + '")').parent('tr'),
-            dayChecks = $(studentRow).children('.attend-col').children('input');
-
-        dayChecks.each(function(i) {
-            $(this).prop('checked', days[i]);
-        });
-    });
-
-    // When a checkbox is clicked, update localStorage
-    $allCheckboxes.on('click', function() {
-        var studentRows = $('tbody .student'),
-            newAttendance = {};
-
-        studentRows.each(function() {
-            var name = $(this).children('.name-col').text(),
-                $allCheckboxes = $(this).children('td').children('input');
-
-            newAttendance[name] = [];
-
-            $allCheckboxes.each(function() {
-                newAttendance[name].push($(this).prop('checked'));
-            });
-        });
-
-        countMissing();
-        localStorage.attendance = JSON.stringify(newAttendance);
-    });
-
     window.MVC = {
         model: function () {
             return model;
@@ -181,6 +110,5 @@
         } 
     };
 
-    countMissing();
     controller.init();
 }());
