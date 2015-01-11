@@ -28,31 +28,55 @@
 
 
 /* STUDENT APPLICATION */
-$(function() {
+(function() {
+    var Student =  function() {
+            this.name = "";
+            this.missedDays = 0;
+            this.attendance = [];
+    };
+
+    Student.prototype.missDay = function(day) {
+        this.attendance[day] = false;
+        this.missedDays += 1;
+    }
+
+    Student.prototype.attendDay = function(day) {
+        this.attendance[day] = true;
+        this.missedDays -= 1;
+    }
+
     var model = {
         days: 12,
         students: [
             {
                 name: "Slappy the Frog",
-                missedDays: 0
+                missedDays: 0,
+                attendance: []
             },
             {
                 name: "Lilly the Lizard",
-                missedDays: 0
+                missedDays: 0,
+                attendance: []
             },
             {
                 name: "Paulrus the Walrus",
-                missedDays: 0
+                missedDays: 0,
+                attendance: []
             },
             {
                 name: "Gregory the Goat",
-                missedDays: 0
+                missedDays: 0,
+                attendance: []
             },
             {
                 name: "Adam the Anaconda",
-                missedDays: 0
+                missedDays: 0,
+                attendance: []
             }
-        ]
+        ],
+        getStudents: function() {
+            return model.students;
+        }
     };
 
     var controller = {
@@ -79,7 +103,7 @@ $(function() {
             $("thead tr").append('<th class="missed-col">Days Missed-col</th>');
         },
         addStudent: function(days, student) {
-            var $student = $('<tr class="student"></tr>');
+            var $student = $('<tr class="' + student.name + '"></tr>');
             $student.append('<td class="name-col">' + student.name + '</td>');
             for (var i = 1; i <= days; i++) {
                 $student.append('<td class="attend-col"><input type="checkbox"></td>');
@@ -144,6 +168,19 @@ $(function() {
         countMissing();
         localStorage.attendance = JSON.stringify(newAttendance);
     });
+
+    window.MVC = {
+        model: function () {
+            return model;
+        },
+        view: function () {
+            return view;
+        },
+        controller: function () {
+            return controller;
+        } 
+    };
+
     countMissing();
     controller.init();
 }());
