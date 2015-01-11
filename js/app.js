@@ -31,18 +31,20 @@
 (function() {
     var Student =  function(name) {
             this.name = name;
-            this.missedDays = 0;
-            this.attendance = [];
+            this.attendance = [false, false, true, false, false, false, false, false, false, false, false, false];
+            this.missedDays = this.attendance.reduce(function(a, b) {
+              return a + b;
+            });;
     };
 
-    Student.prototype.missDay = function(day) {
-        this.attendance[day] = false;
-        this.missedDays += 1;
+    Student.prototype.toggleAttendance = function(day) {
+        this.attendance[day] = !this.attendance[day];
+        this.missedDays = this.attendance.reduce(function(a, b) {
+          return a + b;
+        });;
     }
 
     Student.prototype.attendDay = function(day) {
-        this.attendance[day] = true;
-        this.missedDays -= 1;
     }
 
     var model = {
@@ -62,7 +64,7 @@
     var controller = {
         init: function() {
             view.renderHeadings(controller.createHeadings(model.days));
-            view.renderStudents(model.days, model.students);
+            view.renderStudents(model.students);
         },
         createHeadings: function(days) {
             var a = [];
@@ -70,6 +72,11 @@
                 a.push(i);
             }
             return a;
+        },
+        click: function(student, day) {
+            console.log(student + ":" + day);
+            model.students[student].toggleAttendance(day);
+            view.renderStudents(model.students);
         }
     }
 
@@ -82,19 +89,32 @@
             }
             $("thead tr").append('<th class="missed-col">Days Missed-col</th>');
         },
-        addStudent: function(days, student) {
+        addStudent: function(student) {
+            var days = student.attendance.length;
             var $student = $('<tr class="' + student.name + '"></tr>');
             $student.append('<td class="name-col">' + student.name + '</td>');
-            for (var i = 1; i <= days; i++) {
-                $student.append('<td class="attend-col"><input type="checkbox"></td>');
+            for (var i = 0; i < days; i++) {
+                $student.append('<td class="attend-col"><input type="checkbox"' + (student.attendance[i] ? " checked" : "") + '></td>');
             }
             $student.append('<td class="missed-col">' + student.missedDays + '</td>');
             $('tbody').append($student);
         },
-        renderStudents: function(days, students) {
+        renderStudents: function(students) {
+            $('tbody').html('');
             for (student in students) {
-                view.addStudent(days,students[student]);
+                view.addStudent(students[student]);
             }
+            view.addClickers();
+        },
+        addClickers: function() {
+            $('tbody tr').each(function(row_i){
+                //TODO: Change this from the td to the checkbox
+                $(this).find('.attend-col').each(function(col_i){
+                    $(this).click(function() {
+                        controller.click(row_i, col_i);
+                    });
+                });
+            });
         }
     };
 
