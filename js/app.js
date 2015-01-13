@@ -3,7 +3,7 @@
  * attendance record if one is not found
  * within localStorage.
  */
-(function() {
+/*(function() {
     if (!localStorage.attendance) {
         console.log('Creating attendance records...');
         function getRandom() {
@@ -24,47 +24,78 @@
 
         localStorage.attendance = JSON.stringify(attendance);
     }
-}());
+}());*/
 
 
 /* STUDENT APPLICATION */
 (function() {
-    var Student =  function(name) {
+    var Student = function(name, attendance) {
             this.name = name;
-            this.attendance = [false, false, true, false, false, false, false, false, false, false, false, false];
-            this.missedDays = this.attendance.reduce(function(a, b) {
-              return a + b;
-            });;
+            this.attendance = attendance;
+            this.updateMissedDays();
     };
 
     Student.prototype.toggleAttendance = function(day) {
         this.attendance[day] = !this.attendance[day];
-        this.missedDays = this.attendance.reduce(function(a, b) {
-          return a + b;
-        });;
+        this.updateMissedDays();
     }
 
-    Student.prototype.attendDay = function(day) {
+    Student.prototype.updateMissedDays = function() {
+        this.missedDays = this.attendance.reduce(function(a, b) {
+          return a + b;
+        });
     }
+
+    var startStudents = ["Slappy the Frog",
+            "Lilly the Lizard",
+            "Paulrus the Walrus",
+            "Gregory the Goat",
+            "Adam the Anaconda"];
+
+    var genRepeatArray = function(value, times){
+            var result = [];
+            for (var i = 0; i < times; i++) {
+                result.push(value)
+            };
+            return result;
+        };
 
     var model = {
         days: 12,
-        students: [
-            new Student("Slappy the Frog"),
-            new Student("Lilly the Lizard"),
-            new Student("Paulrus the Walrus"),
-            new Student("Gregory the Goat"),
-            new Student("Adam the Anaconda")
-        ],
+        students: [],
+        init: function() {
+            if (!localStorage.getItem("attendance")) {
+                for (student in startStudents) {
+                    model.addStudent(startStudents[student], genRepeatArray(false, model.days));  
+                }
+                model.saveStudents();
+            } else {
+                model.loadStudents();   
+            }
+        },
+        addStudent: function(name, attendance){
+            var student = new Student(name, attendance);
+            model.students.push(student);
+            
+        },
         getStudents: function() {
             return model.students;
+        },
+        saveStudents: function(student) {
+            localStorage.setItem("attendance", JSON.stringify(model.getStudents()));
+        },
+        loadStudents: function() {
+            var students = JSON.parse(localStorage.getItem("attendance"));
+            for (student in students) {
+                model.addStudent(students[student].name, students[student].attendance);  
+            }
         }
     };
 
     var controller = {
         init: function() {
-            view.renderHeadings(controller.createHeadings(model.days));
-            view.renderStudents(model.students);
+            model.init();
+            view.init();
         },
         createHeadings: function(days) {
             var a = [];
@@ -76,16 +107,21 @@
         click: function(student, day) {
             console.log(student + ":" + day);
             model.students[student].toggleAttendance(day);
+            model.saveStudents();
             view.renderStudents(model.students);
         }
     }
 
     var view = {
+        init: function(){
+            view.renderHeadings(controller.createHeadings(model.days));
+            view.renderStudents(model.students);
+        },
         renderHeadings: function(days) {
             $("thead tr").append('<th class="name-col">Student Name</th>');
             var length = days.length;
             for (var i = 0; i < length; i++) {
-                $("thead tr").append('<th>' + i + '</th>');
+                $("thead tr").append('<th>' + (i + 1) + '</th>');
             }
             $("thead tr").append('<th class="missed-col">Days Missed-col</th>');
         },
